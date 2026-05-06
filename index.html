@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>GBM Trading Strategy - PnL e Drawdown</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    h1, h2 {
+      color: #1f5a92;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin: 25px 0;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #dbe4ee;
+    }
+
+    .control-group label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .value {
+      color: #1f5a92;
+      font-weight: bold;
+    }
+
+    button {
+      background: #1f5a92;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin: 25px 0;
+    }
+
+    .card {
+      background: #eef3f8;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 5px solid #1f5a92;
+    }
+
+    .card h3 {
+      margin: 0 0 8px 0;
+    }
+
+    .chart-box {
+      margin-top: 25px;
+      border: 1px solid #dbe4ee;
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .formula {
+      background: #f3f4f6;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: "Courier New", monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Trading Strategy su GBM</h1>
+
+    <p>
+      Questa applicazione genera un processo stocastico di tipo
+      <strong>Geometric Brownian Motion</strong> e applica una strategia
+      buy/sell basata su una media mobile. Vengono calcolati il
+      <strong>PnL totale</strong> e il <strong>Maximum Drawdown</strong>.
+    </p>
+
+    <div class="formula">
+      Regola: BUY se S(t) &gt; MA(t), SELL se S(t) &lt; MA(t)
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Numero passi n</label>
+        <input type="range" id="nSlider" min="100" max="2000" value="500" step="100">
+        <span class="value" id="nValue">500</span>
+      </div>
+
+      <div class="control-group">
+        <label>Orizzonte temporale T</label>
+        <input type="range" id="tSlider" min="1" max="10" value="1" step="1">
+        <span class="value" id="tValue">1</span>
+      </div>
+
+      <div class="control-group">
+        <label>Valore iniziale S₀</label>
+        <input type="range" id="s0Slider" min="50" max="300" value="100" step="10">
+        <span class="value" id="s0Value">100</span>
+      </div>
+
+      <div class="control-group">
+        <label>Drift μ</label>
+        <input type="range" id="muSlider" min="-0.5" max="0.5" value="0.08" step="0.01">
+        <span class="value" id="muValue">0.08</span>
+      </div>
+
+      <div class="control-group">
+        <label>Volatilità σ</label>
+        <input type="range" id="sigmaSlider" min="0.05" max="1" value="0.25" step="0.01">
+        <span class="value" id="sigmaValue">0.25</span>
+      </div>
+
+      <div class="control-group">
+        <label>Finestra media mobile</label>
+        <input type="range" id="maSlider" min="5" max="100" value="20" step="5">
+        <span class="value" id="maValue">20</span>
+      </div>
+    </div>
+
+    <button onclick="generaSimulazione()">Genera simulazione</button>
+
+    <div class="stats">
+      <div class="card">
+        <h3>PnL finale</h3>
+        <p id="finalPnL">0</p>
+      </div>
+
+      <div class="card">
+        <h3>Maximum Drawdown</h3>
+        <p id="maxDD">0</p>
+      </div>
+
+      <div class="card">
+        <h3>Numero operazioni</h3>
+        <p id="numTrades">0</p>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <canvas id="priceChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <canvas id="pnlChart"></canvas>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
